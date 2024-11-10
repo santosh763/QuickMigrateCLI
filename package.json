@@ -1,0 +1,17 @@
+{
+  "name": "quickmigrate",
+  "version": "1.0.0",
+  "description": "A simple CLI tool for migration",
+  "main": "index.js",
+  "bin": {
+    "quickmigrate": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "setup": "node setup.js"
+  },
+  "dependencies": {
+    "commander": "^10.0.1",
+    "inquirer": "^9.3.7"
+  }
+}
