@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
-const { program } = require('commander');
-import inquirer from "inquirer";
 
+import inquirer from "inquirer";
+import commander from "inquirer";
+const { program } = commander;
 program
   .version('1.0.0')
   .description('Welcome to QuickMigrate CLI');
