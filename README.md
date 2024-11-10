@@ -8,3 +8,7 @@ Welcome to QuickMigrate CLI! This tool helps you configure and migrate between d
    ```bash
    git clone https://github.com/yourusername/quickmigrate.git
    cd quickmigrate
+   npm run setup
+quickmigrate
+
+
