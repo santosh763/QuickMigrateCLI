@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 
+const { program } = require('commander');
+const readline = require('readline');
 
-import inquirer from "inquirer";
-import commander from "inquirer";
-const { program } = commander;
 program
   .version('1.0.0')
   .description('Welcome to QuickMigrate CLI');
@@ -25,67 +24,80 @@ program
 program
   .command('init')
   .description('Initialize or configure migration')
-  .action(async () => {
-    const { sourceCluster } = await inquirer.prompt([
-      {
-        type: 'list',
-        name: 'sourceCluster',
-        message: 'Please configure your source cluster',
-        choices: ['GKE', 'Openshift']
+  .action(() => {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+
+    rl.question('Please configure your source cluster (GKE/Openshift): ', (sourceCluster) => {
+      if (sourceCluster.toLowerCase() === 'gke') {
+        rl.question('Enter your GKE username: ', (username) => {
+          rl.question('Enter your GKE password: ', (password) => {
+            rl.question('Enter your GKE cluster API URL: ', (apiUrl) => {
+              console.log(`GKE Configuration: Username=${username}, Password=${password}, API URL=${apiUrl}`);
+              configureTargetCluster(rl);
+            });
+          });
+        });
+      } else if (sourceCluster.toLowerCase() === 'openshift') {
+        rl.question('Enter your Openshift username: ', (username) => {
+          rl.question('Enter your Openshift password: ', (password) => {
+            rl.question('Enter your Openshift cluster API URL: ', (apiUrl) => {
+              console.log(`Openshift Configuration: Username=${username}, Password=${password}, API URL=${apiUrl}`);
+              configureTargetCluster(rl);
+            });
+          });
+        });
+      } else {
+        console.log('Invalid source cluster. Please enter GKE or Openshift.');
+        rl.close();
       }
-    ]);
+    });
 
-    if (sourceCluster === 'GKE') {
-      const gkeConfig = await inquirer.prompt([
-        { type: 'input', name: 'username', message: 'Enter your GKE username?' },
-        { type: 'password', name: 'password', message: 'Enter your GKE password?' },
-        { type: 'input', name: 'apiUrl', message: 'Enter your GKE cluster API URL?' }
-      ]);
-      console.log('GKE Configuration:', gkeConfig);
-    } else if (sourceCluster === 'Openshift') {
-      const openshiftConfig = await inquirer.prompt([
-        { type: 'input', name: 'username', message: 'Enter your Openshift username?' },
-        { type: 'password', name: 'password', message: 'Enter your Openshift password?' },
-        { type: 'input', name: 'apiUrl', message: 'Enter your Openshift cluster API URL?' }
-      ]);
-      console.log('Openshift Configuration:', openshiftConfig);
-    }
-
-    const { targetCluster } = await inquirer.prompt([
-      {
-        type: 'list',
-        name: 'targetCluster',
-        message: 'Please configure your target cluster',
-        choices: ['GKE', 'Openshift']
-      }
-    ]);
-
-    if (targetCluster === 'GKE') {
-      const gkeTargetConfig = await inquirer.prompt([
-        { type: 'input', name: 'apiUrl', message: 'Enter GKE cluster API URL?' },
-        { type: 'password', name: 'token', message: 'Enter GKE cluster token?' },
-        { type: 'password', name: 'password', message: 'Enter GKE cluster password?' }
-      ]);
-      console.log('GKE Target Configuration:', gkeTargetConfig);
-    } else if (targetCluster === 'Openshift') {
-      const openshiftTargetConfig = await inquirer.prompt([
-        { type: 'input', name: 'apiUrl', message: 'Enter Openshift cluster URL?' },
-        { type: 'password', name: 'token', message: 'Enter Openshift cluster token?' },
-        { type: 'password', name: 'password', message: 'Enter Openshift cluster password?' }
-      ]);
-      console.log('Openshift Target Configuration:', openshiftTargetConfig);
+    function configureTargetCluster(rl) {
+      rl.question('Please configure your target cluster (GKE/Openshift): ', (targetCluster) => {
+        if (targetCluster.toLowerCase() === 'gke') {
+          rl.question('Enter GKE cluster API URL: ', (apiUrl) => {
+            rl.question('Enter GKE cluster token: ', (token) => {
+              rl.question('Enter GKE cluster password: ', (password) => {
+                console.log(`GKE Target Configuration: API URL=${apiUrl}, Token=${token}, Password=${password}`);
+                rl.close();
+              });
+            });
+          });
+        } else if (targetCluster.toLowerCase() === 'openshift') {
+          rl.question('Enter Openshift cluster URL: ', (apiUrl) => {
+            rl.question('Enter Openshift cluster token: ', (token) => {
+              rl.question('Enter Openshift cluster password: ', (password) => {
+                console.log(`Openshift Target Configuration: API URL=${apiUrl}, Token=${token}, Password=${password}`);
+                rl.close();
+              });
+            });
+          });
+        } else {
+          console.log('Invalid target cluster. Please enter GKE or Openshift.');
+          rl.close();
+        }
+      });
     }
   });
 
 program
   .command('login')
   .description('Log in to the system')
-  .action(async () => {
-    const credentials = await inquirer.prompt([
-      { type: 'input', name: 'username', message: 'Enter your username' },
-      { type: 'password', name: 'password', message: 'Enter your password' }
-    ]);
-    console.log(`Login successful! Welcome, ${credentials.username}!`);
+  .action(() => {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+
+    rl.question('Enter your username: ', (username) => {
+      rl.question('Enter your password: ', (password) => {
+        console.log(`Login successful! Welcome, ${username}!`);
+        rl.close();
+      });
+    });
   });
 
 program
